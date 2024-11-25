@@ -103,9 +103,9 @@ struct VecEnvInfo {
       reward_vector.push_back(infos[i].reward);
       done_vector.push_back(infos[i].done);
     }
-    obs = torch::stack(obs_vector);
-    reward = torch::from_blob(reward_vector.data(), num_envs, torch::kFloat32);
-    done = torch::from_blob(done_vector.data(), num_envs, torch::kFloat32);
+    obs = torch::stack(obs_vector).clone();
+    reward = torch::from_blob(reward_vector.data(), num_envs, torch::kFloat32).clone();
+    done = torch::from_blob(done_vector.data(), num_envs, torch::kFloat32).clone();
   }
 };
 

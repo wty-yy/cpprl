@@ -3,10 +3,12 @@ project(env_test VERSION 1.0)
 
 
 set(EXECUTABLES
-    # test_ale tests/test_ale.cpp
-    # test_fmt tests/test_fmt.cpp
-    test_ale_vec_env tests/test_ale_vec_env.cpp
-    # test tests/test.cpp
+  # test_ale tests/test_ale.cpp
+  # test_fmt tests/test_fmt.cpp
+  # test_ale_vec_env tests/test_ale_vec_env.cpp
+  # test tests/test.cpp
+  # test2 tests/test2.cpp
+  train ppo_atari.cpp
 )
 
 list(LENGTH EXECUTABLES EXECUTABLES_LENGTH)
@@ -21,7 +23,7 @@ foreach(i RANGE 0 ${NUM_TARGETS_MINUS_ONE})
 
   add_executable(${EXEC_NAME} ${SRC_FILE})
 
-  target_include_directories(${EXEC_NAME} PUBLIC env)
+  target_include_directories(${EXEC_NAME} PUBLIC env include)
 
   ### Torch ###
   find_package(Torch REQUIRED)

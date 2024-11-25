@@ -6,8 +6,8 @@
 
 struct EnvSpace {
   EnvSpace(){}
-  EnvSpace(std::vector<int> shape, double n=NAN) : shape(shape) {
-    if (std::isnan(n)) {
+  EnvSpace(std::vector<int> shape, int n=-1) : shape(shape), n(n) {
+    if (n == -1) {
       n = 1;
       for (auto& x : shape) n *= x;
       this->n = int(n);
