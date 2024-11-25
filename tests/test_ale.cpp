@@ -1,0 +1,65 @@
+#include <iostream>
+#include <ale/ale_interface.hpp>
+#include <opencv2/opencv.hpp>
+
+void saveFrameAsImage(const ale::ALEInterface& ale, const std::string& filename) {
+  // 获取屏幕 RGB 数据
+  std::vector<unsigned char> screen;
+  ale.getScreenRGB(screen);
+  auto tmp = ale.getScreen();
+
+  // ALE 图像分辨率
+  const int width = tmp.width();
+  const int height = tmp.height();
+
+  // OpenCV Mat 构造图像 (高度，宽度，3 通道)
+  cv::Mat frame(height, width, CV_8UC3, screen.data());
+  cv::cvtColor(frame, frame, cv::COLOR_BGR2RGB);
+
+  // OpenCV 保存为图片
+  if (cv::imwrite(filename, frame)) {
+    std::cout << "Image saved to " << filename << std::endl;
+  } else {
+    std::cerr << "Failed to save image!" << std::endl;
+  }
+}
+
+int main(int argc, char** argv) {
+
+  ale::ALEInterface ale(true);
+  ale.setInt("random_seed", 123);
+  ale.loadROM(std::string("/home/yy/Coding/datasets/roms/breakout.bin"));
+  // ale.loadROM("asterix.bin");
+
+  ale::ActionVect legal_actions = ale.getLegalActionSet();
+
+  std::cout << "legal_actions.size=" << legal_actions.size() << '\n';
+  ale.reset_game();
+
+  float totalReward = 0.0;
+  int count = 0;
+  while (!ale.game_over()) {
+    // 保存图片 (每次执行前检查)
+    // std::string filename = "frame_" + std::to_string(count) + ".jpg";
+    std::string filename = "current.jpg";
+    saveFrameAsImage(ale, filename);
+
+    int act_idx, repeat;  // NOOP, FIRE, UP, RIGHT, LEFT
+    std::cin >> act_idx >> repeat;
+    // ale::Action a = legal_actions[std::rand() % legal_actions.size()];
+    if (act_idx == -1) {  // reset
+      ale.reset_game();
+      continue;
+    }
+    for (int i = 0; i < repeat; i++) {
+      ale::Action a = legal_actions[act_idx];
+      float reward = ale.act(a);
+      totalReward += reward;
+    }
+    count += 1;
+
+    printf("count=%d, score=%f, lives=%d\n", count, totalReward, ale.lives());
+  }
+
+  return 0;
+}
